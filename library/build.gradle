@@ -1,0 +1,64 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
+}
+
+android {
+    namespace 'com.mikhaellopez.circularimageview'
+    compileSdkVersion 33
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 33
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    tasks.withType(JavaCompile).configureEach{
+        options.fork = true
+        options.forkOptions.jvmArgs +=[
+                '--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED',
+                '--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
+                '--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED']
+    }
+    lintOptions {
+        disable 'GradleDependency', 'ExpiringTargetSdkVersion'
+    }
+}
+
+dependencies {
+    implementation "androidx.appcompat:appcompat:1.5.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.10"
+}
+
+afterEvaluate {
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/drdream-space/CircularImageView")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("PASSWORD")
+                }
+            }
+        }
+        publications {
+            release(MavenPublication) {
+                from components.findByName('release')
+                groupId = "dream-space"
+                artifactId = "dreamspace.CircularImageView"
+                version = "1.0"
+            }
+        }
+    }
+}
+

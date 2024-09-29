@@ -1,1 +1,3 @@
-include ':circularimageview-example', ':circularimageview'
+rootProject.name = "CircularImageView"
+include ':app'
+include ':library'
